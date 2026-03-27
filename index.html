@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Amoha's Maths Stars</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Baloo+2:wght@800;900&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'Nunito', sans-serif;
+  background: #f5f3ef;
+  color: #222;
+  overflow: hidden;
+}
+
+/* ─── THE WHOLE APP IS ONE FIXED COLUMN ─── */
+#app {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #f5f3ef;
+}
+
+/* ─── TOP BAR ─── */
+#topbar {
+  flex-shrink: 0;
+  height: 52px;
+  background: #fff;
+  border-bottom: 2px solid #e5e0da;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+#topbar-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #d95f0a;
+}
+#topbar-stars {
+  background: #fffbeb;
+  border: 2px solid #fcd34d;
+  border-radius: 99px;
+  padding: 4px 12px;
+  font-weight: 900;
+  color: #d97706;
+  font-size: .85rem;
+}
+
+/* ─── BOTTOM NAV ─── */
+#botnav {
+  flex-shrink: 0;
+  height: 54px;
+  background: #fff;
+  border-top: 2px solid #e5e0da;
+  display: flex;
+}
+.bnbtn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: none;
+  background: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: .62rem;
+  font-weight: 800;
+  color: #aaa;
+  cursor: pointer;
+}
+.bnbtn .bnico { font-size: 1.2rem; }
+.bnbtn.on { color: #d95f0a; }
+
+/* ─── MIDDLE = scrollable page area ─── */
+#pages {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Each page fills the middle area completely */
+.page {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.page.on { display: flex; }
+
+/* ─────────────────────────────────────── */
+/*  HOME PAGE                             */
+/* ─────────────────────────────────────── */
+#pg-home {
+  padding: 14px;
+  gap: 13px;
+}
+
+.welcome-box {
+  background: #fff;
+  border-radius: 16px;
+  border: 2px solid #e5e0da;
+  padding: 18px 16px;
+  text-align: center;
+}
+.welcome-box .bigstar { font-size: 2.2rem; }
+.welcome-box h2 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 4px 0 3px;
+}
+.welcome-box p { color: #888; font-size: .85rem; line-height: 1.5; }
+
+.sec { font-size: .65rem; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 7px; }
+
+.tgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.tcell {
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 13px;
+  padding: 12px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .12s;
+  position: relative;
+}
+.tcell:active { transform: scale(.96); }
+.tcell.locked { opacity: .38; cursor: default; filter: grayscale(1); }
+.tnum {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.tlbl { font-size: .58rem; font-weight: 800; color: #aaa; text-transform: uppercase; margin-top: 1px; }
+.tstarrow { font-size: .65rem; margin-top: 3px; }
+.lockico { position: absolute; top: 4px; right: 6px; font-size: .65rem; opacity: .5; }
+
+.row2 { display: flex; gap: 9px; }
+.bigbtn {
+  flex: 1;
+  padding: 13px 8px;
+  border-radius: 13px;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: transform .12s;
+}
+.bigbtn:active { transform: scale(.97); }
+.btn-star { background: #f59e0b; color: #fff; }
+.btn-blue { background: #1b5fa3; color: #fff; }
+
+.unlock-box {
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+  border-radius: 14px;
+  padding: 13px 14px;
+}
+.unlock-box h3 { font-size: .8rem; font-weight: 900; color: #15803d; margin-bottom: 7px; }
+.urow { display: flex; gap: 7px; }
+.uinput {
+  flex: 1;
+  border: 2px solid #86efac;
+  border-radius: 9px;
+  padding: 8px 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: .9rem;
+  background: #fff;
+  outline: none;
+}
+.ubtn {
+  padding: 8px 15px;
+  border-radius: 9px;
+  border: none;
+  background: #15803d;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: .82rem;
+  cursor: pointer;
+}
+.umsg { font-size: .75rem; font-weight: 800; color: #15803d; min-height: 15px; margin-top: 5px; }
+
+/* ─────────────────────────────────────── */
+/*  PRACTICE PAGE                         */
+/*  Layout: back | title | tabs           */
+/*          [big question card]           */
+/*          [feedback - fixed height]     */
+/*          [progress bar]                */
+/*          [score strip]                 */
+/*          [big input]                   */
+/*          [big GO button]               */
+/* Everything is in ONE column, no flex   */
+/* tricks — just padding and fixed sizes  */
+/* ─────────────────────────────────────── */
+#pg-prac {
+  padding: 0;
+  overflow: hidden; /* we control scroll ourselves */
+}
+
+/* The practice page itself is a fixed column */
+#prac-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 14px 10px;
+  gap: 0;
+}
+
+.back-row {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+}
+.backbtn {
+  background: none;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: .82rem;
+  color: #aaa;
+  cursor: pointer;
+  padding: 0;
+}
+.backbtn:hover { color: #444; }
+#prac-heading {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+/* MODE TABS */
+.mtabs {
+  flex-shrink: 0;
+  display: flex;
+  background: #e5e0da;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+  margin-bottom: 10px;
+}
+.mtab {
+  flex: 1;
+  padding: 7px 2px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: .65rem;
+  color: #999;
+  cursor: pointer;
+  text-align: center;
+}
+.mtab.on { background: #fff; color: #222; }
+
+/* BIG QUESTION CARD */
+#qcard {
+  flex-shrink: 0;
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 16px;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 14px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+#qtext {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  line-height: 1.1;
+}
+#qword {
+  font-size: .92rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+#qword b { color: #d95f0a; font-weight: 900; }
+#qhint { font-size: .72rem; color: #aaa; margin-top: 4px; }
+
+/* FEEDBACK — fixed height, NEVER changes layout */
+#fbrow {
+  flex-shrink: 0;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+#fbtext {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  opacity: 0;
+  transition: opacity .1s;
+}
+#fbtext.show { opacity: 1; }
+#fbtext.ok { color: #15803d; }
+#fbtext.no { color: #dc2626; }
+
+/* PROGRESS BAR */
+#progwrap {
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+#proglbl {
+  display: flex;
+  justify-content: space-between;
+  font-size: .68rem;
+  font-weight: 800;
+  color: #aaa;
+  margin-bottom: 3px;
+}
+#progtrack {
+  height: 8px;
+  background: #e5e0da;
+  border-radius: 99px;
+  overflow: hidden;
+}
+#progfill {
+  height: 100%;
+  background: linear-gradient(90deg, #15803d, #22c55e);
+  border-radius: 99px;
+  width: 0%;
+  transition: width .3s;
+}
+
+/* SCORE STRIP */
+#scorestrip {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 12px;
+  padding: 8px 6px;
+  margin-bottom: 10px;
+}
+.scitem { text-align: center; }
+.scval {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.sclbl { font-size: .6rem; font-weight: 800; color: #aaa; text-transform: uppercase; margin-top: 1px; }
+
+/* THE BIG ANSWER INPUT */
+#ansinp {
+  flex-shrink: 0;
+  width: 100%;
+  height: 72px;
+  border: 3px solid #e5e0da;
+  border-radius: 14px;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  text-align: center;
+  color: #222;
+  background: #fff;
+  outline: none;
+  margin-bottom: 10px;
+  -webkit-appearance: none;
+  display: block;
+}
+#ansinp:focus { border-color: #1b5fa3; }
+#ansinp.ok { border-color: #15803d; background: #f0fdf4; color: #15803d; }
+#ansinp.no { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
+
+/* THE BIG GO BUTTON */
+#gobtn {
+  flex-shrink: 0;
+  width: 100%;
+  height: 64px;
+  border-radius: 14px;
+  border: none;
+  background: #d95f0a;
+  color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #9e4107;
+  transition: transform .08s, box-shadow .08s;
+  display: block;
+  letter-spacing: .02em;
+}
+#gobtn:active { transform: translateY(4px); box-shadow: 0 1px 0 #9e4107; }
+
+/* ─── CHANT VIEW (inside practice page) ─── */
+#chant-wrap {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 14px;
+}
+#chant-list {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+.crow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px;
+  border-bottom: 1px solid #f0ede8;
+  font-size: .95rem;
+}
+.crow:last-child { border-bottom: none; }
+.crow:nth-child(even) { background: #fafaf8; }
+.cleft { font-weight: 800; }
+.cans { font-family: 'Baloo 2', sans-serif; font-size: 1.2rem; font-weight: 900; }
+#chant-gobtn {
+  flex-shrink: 0;
+  width: 100%;
+  height: 60px;
+  border-radius: 14px;
+  border: none;
+  background: #d95f0a;
+  color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* ─── RESULTS VIEW (inside practice page) ─── */
+#res-wrap {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px 14px;
+}
+.res-card {
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 18px;
+  padding: 30px 20px;
+  text-align: center;
+  width: 100%;
+}
+.res-ico { font-size: 3rem; margin-bottom: 8px; }
+.res-title { font-family: 'Baloo 2', sans-serif; font-size: 1.7rem; font-weight: 900; margin-bottom: 4px; }
+.res-sub { color: #888; font-size: .85rem; margin-bottom: 12px; line-height: 1.5; }
+.res-stars { font-size: 1.8rem; letter-spacing: 4px; margin-bottom: 18px; }
+.res-btns { display: flex; gap: 10px; justify-content: center; }
+.resbtn {
+  padding: 12px 22px;
+  border-radius: 12px;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: .9rem;
+  cursor: pointer;
+}
+.resbtn-o { background: #d95f0a; color: #fff; }
+.resbtn-g { background: #e5e0da; color: #444; }
+
+/* ─────────────────────────────────────── */
+/*  STAR ROUND PAGE                       */
+/* ─────────────────────────────────────── */
+#pg-star { padding: 14px; gap: 12px; }
+
+#star-active-wrap {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 14px 10px;
+  gap: 0;
+}
+#star-timer {
+  flex-shrink: 0;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #d95f0a;
+  text-align: center;
+  margin-bottom: 8px;
+}
+#star-qcard {
+  flex-shrink: 0;
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 16px;
+  min-height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+#star-qtext {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 3.2rem;
+  font-weight: 900;
+}
+#star-fbrow {
+  flex-shrink: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+#star-fbtext {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 900;
+  opacity: 0;
+  transition: opacity .1s;
+}
+#star-fbtext.show { opacity: 1; }
+#star-fbtext.ok { color: #15803d; }
+#star-fbtext.no { color: #dc2626; }
+
+#star-strip {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-around;
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 12px;
+  padding: 8px 6px;
+  margin-bottom: 10px;
+}
+
+#star-ansinp {
+  flex-shrink: 0;
+  width: 100%;
+  height: 72px;
+  border: 3px solid #e5e0da;
+  border-radius: 14px;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 900;
+  text-align: center;
+  color: #222;
+  background: #fff;
+  outline: none;
+  margin-bottom: 10px;
+  -webkit-appearance: none;
+  display: block;
+}
+#star-ansinp:focus { border-color: #1b5fa3; }
+#star-ansinp.ok { border-color: #15803d; background: #f0fdf4; color: #15803d; }
+#star-ansinp.no { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
+
+#star-gobtn {
+  flex-shrink: 0;
+  width: 100%;
+  height: 64px;
+  border-radius: 14px;
+  border: none;
+  background: #f59e0b;
+  color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #b45309;
+  transition: transform .08s, box-shadow .08s;
+  display: block;
+}
+#star-gobtn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b45309; }
+
+#star-res-wrap {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px 14px;
+}
+
+/* ─────────────────────────────────────── */
+/*  PROGRESS PAGE                         */
+/* ─────────────────────────────────────── */
+#pg-prog { padding: 14px; gap: 12px; }
+.prog-total {
+  background: #fffbeb;
+  border: 2px solid #fcd34d;
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+.prog-total-num {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  color: #d97706;
+  line-height: 1;
+}
+.prog-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.prog-card {
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 13px;
+  padding: 12px 12px;
+}
+.prog-card h4 {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 900;
+  font-size: .88rem;
+  margin-bottom: 3px;
+}
+.prog-stars { font-size: .9rem; margin: 2px 0; }
+.prog-det { font-size: .68rem; color: #aaa; font-weight: 700; }
+.star-best-box {
+  background: #fff;
+  border: 2px solid #e5e0da;
+  border-radius: 13px;
+  padding: 13px 14px;
+}
+
+/* ─────────────────────────────────────── */
+/* ANIMATIONS                             */
+/* ─────────────────────────────────────── */
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+@keyframes pop { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+@keyframes ccfall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(105vh) rotate(720deg);opacity:0} }
+
+.shake { animation: shake .22s ease; }
+.pop { animation: pop .22s ease; }
+
+/* CONFETTI */
+#cc { position: fixed; top:0;left:0;right:0;bottom:0; pointer-events:none; z-index:9999; overflow:hidden; }
+.cp { position:absolute; width:8px; height:8px; border-radius:2px; animation: ccfall 1.8s ease-in forwards; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div id="topbar-title">⭐ Amoha's Maths Stars</div>
+    <div id="topbar-stars">⭐ <span id="hstars">0</span></div>
+  </div>
+
+  <!-- PAGES -->
+  <div id="pages">
+
+    <!-- ══════════════ HOME ══════════════ -->
+    <div id="pg-home" class="page on">
+      <div class="welcome-box">
+        <div class="bigstar">⭐</div>
+        <h2>Hello, Amoha!</h2>
+        <p>Pick a table. Keep going until<br><strong>90% correct</strong> — then earn your stars!</p>
+      </div>
+
+      <div>
+        <div class="sec">Choose a Table</div>
+        <div class="tgrid" id="tgrid"></div>
+      </div>
+
+      <div class="row2">
+        <button class="bigbtn btn-star" onclick="goStarSetup()">🏆 Star Round</button>
+        <button class="bigbtn btn-blue" onclick="goProg()">📊 My Progress</button>
+      </div>
+
+      <div class="unlock-box">
+        <h3>🔐 Parent — Unlock Next Table</h3>
+        <div class="urow">
+          <input class="uinput" id="uinp" type="number" placeholder="Enter table (2–9)" min="2" max="9" inputmode="numeric">
+          <button class="ubtn" onclick="doUnlock()">Unlock</button>
+        </div>
+        <div class="umsg" id="umsg"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════ PRACTICE ══════════════ -->
+    <div id="pg-prac" class="page">
+
+      <!-- Normal practice inner -->
+      <div id="prac-inner">
+        <div class="back-row">
+          <button class="backbtn" onclick="goHome()">← Back</button>
+          <div id="prac-heading"></div>
+        </div>
+
+        <div class="mtabs" id="mtabs">
+          <button class="mtab on" data-m="tables" onclick="setMode('tables')">✖ Tables</button>
+          <button class="mtab" data-m="reverse" onclick="setMode('reverse')">🔄 Reverse</button>
+          <button class="mtab" data-m="words" onclick="setMode('words')">🛒 Words</button>
+          <button class="mtab" data-m="chant" onclick="setMode('chant')">📖 See Table</button>
+        </div>
+
+        <div id="qcard">
+          <div id="qtext"></div>
+          <div id="qword" style="display:none;"></div>
+          <div id="qhint"></div>
+        </div>
+
+        <div id="fbrow">
+          <div id="fbtext"></div>
+        </div>
+
+        <div id="progwrap">
+          <div id="proglbl">
+            <span id="progstreaklab">Correct streak</span>
+            <span id="prognum">0%</span>
+          </div>
+          <div id="progtrack"><div id="progfill"></div></div>
+        </div>
+
+        <div id="scorestrip">
+          <div class="scitem">
+            <div class="scval" id="sc-cor" style="color:#15803d">0</div>
+            <div class="sclbl">Correct</div>
+          </div>
+          <div class="scitem">
+            <div class="scval" id="sc-tot">0</div>
+            <div class="sclbl">Done</div>
+          </div>
+          <div class="scitem">
+            <div class="scval" id="sc-pct" style="color:#d97706">0%</div>
+            <div class="sclbl">Score</div>
+          </div>
+        </div>
+
+        <input
+          id="ansinp"
+          type="number"
+          inputmode="numeric"
+          autocomplete="off"
+          placeholder="?"
+          onkeydown="if(event.key==='Enter') doSubmit()"
+        >
+
+        <button id="gobtn" onclick="doSubmit()">GO !</button>
+      </div>
+
+      <!-- Chant inner -->
+      <div id="chant-wrap">
+        <div class="back-row" style="flex-shrink:0;padding:10px 0 6px;">
+          <button class="backbtn" onclick="goHome()">← Back</button>
+          <div id="chant-heading" style="font-family:'Baloo 2',sans-serif;font-size:1.05rem;font-weight:900;"></div>
+        </div>
+        <div id="chant-list"></div>
+        <button id="chant-gobtn" onclick="setMode('tables')">✖ Start Practising!</button>
+      </div>
+
+      <!-- Results inner -->
+      <div id="res-wrap">
+        <div class="res-card">
+          <div class="res-ico" id="res-ico"></div>
+          <div class="res-title" id="res-title"></div>
+          <div class="res-sub" id="res-sub"></div>
+          <div class="res-stars" id="res-stars"></div>
+          <div class="res-btns">
+            <button class="resbtn resbtn-o" onclick="retryPrac()">🔄 Try Again</button>
+            <button class="resbtn resbtn-g" onclick="goHome()">🏠 Home</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ STAR ROUND ══════════════ -->
+    <div id="pg-star" class="page">
+      <!-- Setup -->
+      <div id="star-setup">
+        <button class="backbtn" style="margin-bottom:10px;" onclick="goHome()">← Back</button>
+        <div class="welcome-box" style="margin-bottom:12px;">
+          <div style="font-size:1.9rem;margin-bottom:4px;">🏆</div>
+          <h2 style="color:#d97706;">Star Round!</h2>
+          <p>10 questions. As fast as you can.<br>Beat your personal best time!</p>
+        </div>
+        <div class="sec">Which tables?</div>
+        <div id="star-cbs" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
+        <button style="width:100%;height:62px;border-radius:14px;border:none;background:#f59e0b;
+          color:#fff;font-family:'Baloo 2',sans-serif;font-size:1.2rem;font-weight:900;cursor:pointer;
+          box-shadow:0 5px 0 #b45309;" onclick="beginStar()">⭐ Start Star Round!</button>
+      </div>
+
+      <!-- Active round -->
+      <div id="star-active-wrap">
+        <div id="star-timer">0:00</div>
+        <div id="star-strip">
+          <div class="scitem"><div class="scval" id="star-qn">1</div><div class="sclbl">Question</div></div>
+          <div class="scitem"><div class="scval">/ 10</div><div class="sclbl">Total</div></div>
+          <div class="scitem"><div class="scval" id="star-co" style="color:#15803d">0</div><div class="sclbl">Correct</div></div>
+        </div>
+        <div id="star-qcard"><div id="star-qtext"></div></div>
+        <div id="star-fbrow"><div id="star-fbtext"></div></div>
+        <input id="star-ansinp" type="number" inputmode="numeric" autocomplete="off" placeholder="?"
+          onkeydown="if(event.key==='Enter') doStarSubmit()">
+        <button id="star-gobtn" onclick="doStarSubmit()">GO !</button>
+      </div>
+
+      <!-- Star results -->
+      <div id="star-res-wrap">
+        <div class="res-card">
+          <div class="res-ico" id="sr-ico"></div>
+          <div class="res-title" id="sr-title"></div>
+          <div class="res-sub" id="sr-sub"></div>
+          <div style="font-size:.8rem;color:#aaa;margin-bottom:6px;" id="sr-best"></div>
+          <div class="res-stars" id="sr-stars"></div>
+          <div class="res-btns">
+            <button class="resbtn resbtn-o" onclick="goStarSetup()">🏆 Again</button>
+            <button class="resbtn resbtn-g" onclick="goHome()">🏠 Home</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ PROGRESS ══════════════ -->
+    <div id="pg-prog" class="page">
+      <button class="backbtn" onclick="goHome()">← Back</button>
+      <div class="prog-total">
+        <div style="font-size:.72rem;font-weight:900;color:#d97706;margin-bottom:3px;">TOTAL STARS</div>
+        <div class="prog-total-num" id="ptnum">0</div>
+        <div style="font-size:1.3rem;margin-top:2px;">⭐</div>
+      </div>
+      <div class="sec">My Tables</div>
+      <div class="prog-grid" id="pgrid"></div>
+      <div class="sec">Star Round</div>
+      <div class="star-best-box" id="sbbox"></div>
+      <button style="padding:8px 14px;border-radius:9px;border:2px solid #e5e0da;background:#fff;
+        font-family:'Nunito',sans-serif;font-weight:800;font-size:.75rem;color:#aaa;cursor:pointer;"
+        onclick="if(confirm('Reset all progress?'))resetAll()">🗑 Reset</button>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <div id="botnav">
+    <button class="bnbtn on" id="bn-home" onclick="goHome()"><span class="bnico">🏠</span>Home</button>
+    <button class="bnbtn" id="bn-star" onclick="goStarSetup()"><span class="bnico">🏆</span>Star Round</button>
+    <button class="bnbtn" id="bn-prog" onclick="goProg()"><span class="bnico">📊</span>Progress</button>
+  </div>
+
+</div><!-- /app -->
+
+<div id="cc"></div>
+
+<script>
+// ══════════════════════════════════
+// DATA
+// ══════════════════════════════════
+const TABLES = [2,3,4,5,6,7,8,9];
+const TC = {2:'#1b5fa3',3:'#1a7a4a',4:'#d95f0a',5:'#7c28be',6:'#be1870',7:'#0e766e',8:'#c0161a',9:'#d47206'};
+const TARGET_PCT = 90;   // session ends when rolling accuracy hits 90%
+const MIN_QS = 20;       // must answer at least 20 before session can end
+
+// Word problems — 10 per table
+const WP = {
+  2:[
+    {q:"2 rows of chairs. 7 in each row. How many chairs?",a:14},
+    {q:"Each child has 2 pencils. 8 children. How many pencils?",a:16},
+    {q:"2 bags of 9 apples each. How many apples?",a:18},
+    {q:"2 boxes of 6 toys. How many toys?",a:12},
+    {q:"Each page has 2 pictures. 5 pages. How many pictures?",a:10},
+    {q:"2 birds with 4 eggs each. How many eggs?",a:8},
+    {q:"2 shelves of 10 books each. How many books?",a:20},
+    {q:"3 flowers with 2 leaves each. How many leaves?",a:6},
+    {q:"2 buses with 9 seats each. How many seats?",a:18},
+    {q:"Each box has 2 sweets. 7 boxes. How many sweets?",a:14},
+  ],
+  3:[
+    {q:"3 baskets of 6 mangoes. How many mangoes?",a:18},
+    {q:"3 boxes of 7 sweets. How many sweets?",a:21},
+    {q:"3 friends each have 8 stickers. How many stickers?",a:24},
+    {q:"3 rows of 9 trees. How many trees?",a:27},
+    {q:"5 birds with 3 eggs each. How many eggs?",a:15},
+    {q:"3 bags of 4 oranges. How many oranges?",a:12},
+    {q:"3 shelves of 10 books. How many books?",a:30},
+    {q:"8 children with 3 pens each. How many pens?",a:24},
+    {q:"3 plates of 6 chapatis each. How many chapatis?",a:18},
+    {q:"3 weeks. 7 days each. How many days?",a:21},
+  ],
+  4:[
+    {q:"4 baskets of 6 oranges. How many oranges?",a:24},
+    {q:"4 packets of 8 biscuits. How many biscuits?",a:32},
+    {q:"4 friends with 7 stickers each. How many stickers?",a:28},
+    {q:"9 tables with 4 legs each. How many legs?",a:36},
+    {q:"4 rows of 5 plants. How many plants?",a:20},
+    {q:"4 bags of 3 books. How many books?",a:12},
+    {q:"4 children with 10 crayons each. How many crayons?",a:40},
+    {q:"4 trees with 8 mangoes each. How many mangoes?",a:32},
+    {q:"4 dogs with 4 legs each. How many legs?",a:16},
+    {q:"Each wheel has 4 bolts. 9 wheels. How many bolts?",a:36},
+  ],
+  5:[
+    {q:"6 hands with 5 fingers each. How many fingers?",a:30},
+    {q:"5 friends each have 7 coins. How many coins?",a:35},
+    {q:"Mangoes cost ₹5 each. Papa bought 8. How much?",a:40},
+    {q:"5 rows of 9 flowers. How many flowers?",a:45},
+    {q:"4 stars with 5 points each. How many points?",a:20},
+    {q:"5 packets of 3 sweets. How many sweets?",a:15},
+    {q:"5 shelves of 10 books. How many books?",a:50},
+    {q:"She saves ₹5 a day. 7 days. How much saved?",a:35},
+    {q:"5 nests with 6 eggs each. How many eggs?",a:30},
+    {q:"5 children with 8 crayons each. How many crayons?",a:40},
+  ],
+  6:[
+    {q:"6 boxes of 7 crayons. How many crayons?",a:42},
+    {q:"8 insects with 6 legs each. How many legs?",a:48},
+    {q:"6 children with 4 books each. How many books?",a:24},
+    {q:"6 rows of 9 seats. How many seats?",a:54},
+    {q:"5 flowers with 6 petals each. How many petals?",a:30},
+    {q:"6 bags of 3 mangoes. How many mangoes?",a:18},
+    {q:"6 days of 10 pages a day. How many pages?",a:60},
+    {q:"6 boxes of 8 toys. How many toys?",a:48},
+    {q:"6 pots with 6 plants each. How many plants?",a:36},
+    {q:"Each honeycomb has 6 cells. 7 honeycombs. How many cells?",a:42},
+  ],
+  7:[
+    {q:"4 weeks of 7 days each. How many days?",a:28},
+    {q:"6 weeks of 7 days. How many days?",a:42},
+    {q:"7 children with 8 marbles each. How many marbles?",a:56},
+    {q:"7 rows of 9 tiles. How many tiles?",a:63},
+    {q:"7 packets of 3 biscuits. How many biscuits?",a:21},
+    {q:"7 trees with 5 fruits each. How many fruits?",a:35},
+    {q:"7 children with 10 stickers each. How many stickers?",a:70},
+    {q:"7 baskets of 7 eggs. How many eggs?",a:49},
+    {q:"7 boxes with 4 crayons each. How many crayons?",a:28},
+    {q:"She reads 7 pages a day. 9 days. How many pages?",a:63},
+  ],
+  8:[
+    {q:"6 spiders with 8 legs each. How many legs?",a:48},
+    {q:"8 children with 7 crayons each. How many crayons?",a:56},
+    {q:"8 shelves of 4 books. How many books?",a:32},
+    {q:"5 octopuses with 8 arms each. How many arms?",a:40},
+    {q:"8 bags of 9 mangoes. How many mangoes?",a:72},
+    {q:"8 boxes of 3 sweets. How many sweets?",a:24},
+    {q:"8 children save ₹10 each. How much in total?",a:80},
+    {q:"8 trees with 8 coconuts each. How many coconuts?",a:64},
+    {q:"Each octopus has 8 legs. 7 octopuses. How many legs?",a:56},
+    {q:"8 rows of 6 flowers. How many flowers?",a:48},
+  ],
+  9:[
+    {q:"9 rows of 4 flowers. How many flowers?",a:36},
+    {q:"9 children with 6 stickers each. How many stickers?",a:54},
+    {q:"7 crates of 9 bottles. How many bottles?",a:63},
+    {q:"9 bags of 8 apples. How many apples?",a:72},
+    {q:"5 necklaces of 9 beads each. How many beads?",a:45},
+    {q:"9 children with 3 pencils each. How many pencils?",a:27},
+    {q:"9 days reading 10 pages a day. How many pages?",a:90},
+    {q:"9 shelves of 9 books. How many books?",a:81},
+    {q:"9 monkeys with 2 bananas each. How many bananas?",a:18},
+    {q:"She earns ₹9 a day. 7 days. How much?",a:63},
+  ],
+};
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let S = loadState();
+function loadState() {
+  try { const d = JSON.parse(localStorage.getItem('amoha5')); if (d) return d; } catch(e){}
+  return { unlocked:[2,3], stars:0, prog:{}, starBest:null };
+}
+function saveState() { localStorage.setItem('amoha5', JSON.stringify(S)); }
+
+// ══════════════════════════════════
+// SESSION
+// ══════════════════════════════════
+let ses = { table:2, mode:'tables', pool:[], idx:0, correct:0, total:0 };
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+function init() { buildGrid(); updHdr(); }
+
+function ss(n,m) { return '⭐'.repeat(Math.min(n,m))+'☆'.repeat(Math.max(0,m-n)); }
+function fmt(ms) { const s=Math.floor(ms/1000); return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`; }
+function shuf(a) { return [...a].sort(()=>Math.random()-.5); }
+function pct() { return ses.total===0 ? 0 : Math.round(ses.correct/ses.total*100); }
+
+function buildGrid() {
+  const g = document.getElementById('tgrid'); g.innerHTML = '';
+  TABLES.forEach(t => {
+    const u = S.unlocked.includes(t), p = S.prog[t]||{};
+    const el = document.createElement('div');
+    el.className = 'tcell' + (u ? '' : ' locked');
+    el.innerHTML = `${!u?'<span class="lockico">🔒</span>':''}
+      <div class="tnum" style="color:${TC[t]}">${t}</div>
+      <div class="tlbl">times</div>
+      <div class="tstarrow">${ss(p.stars||0, 3)}</div>`;
+    if (u) el.onclick = () => openPrac(t);
+    g.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  ['bn-home','bn-star','bn-prog'].forEach(b => document.getElementById(b).classList.remove('on'));
+  if (id==='pg-home') document.getElementById('bn-home').classList.add('on');
+  if (id==='pg-star') document.getElementById('bn-star').classList.add('on');
+  if (id==='pg-prog') document.getElementById('bn-prog').classList.add('on');
+}
+
+function goHome() { showPage('pg-home'); buildGrid(); updHdr(); }
+
+function goProg() {
+  showPage('pg-prog');
+  document.getElementById('ptnum').textContent = S.stars;
+  const g = document.getElementById('pgrid'); g.innerHTML = '';
+  TABLES.forEach(t => {
+    const p = S.prog[t]||{}, u = S.unlocked.includes(t);
+    const d = document.createElement('div'); d.className = 'prog-card';
+    d.innerHTML = `<h4 style="color:${TC[t]}">${t} Times Table</h4>
+      <div class="prog-stars">${ss(p.stars||0,3)}</div>
+      <div class="prog-det">Best: ${p.bestPct||0}% accuracy</div>
+      <div class="prog-det">Sessions: ${p.sessions||0}</div>
+      ${!u?'<div class="prog-det" style="margin-top:2px;">🔒 Locked</div>':''}`;
+    g.appendChild(d);
+  });
+  const sb = document.getElementById('sbbox');
+  sb.innerHTML = S.starBest
+    ? `<div style="font-weight:800;font-size:.9rem;">🏆 Personal Best: <span style="color:#d97706;font-family:'Baloo 2',sans-serif;font-size:1.1rem;font-weight:900;">${fmt(S.starBest)}</span></div>
+       <div style="color:#aaa;font-size:.75rem;margin-top:3px;">Keep going to beat it!</div>`
+    : '<div style="color:#aaa;font-size:.82rem;">No Star Round yet — try it!</div>';
+  document.getElementById('bn-prog').classList.add('on');
+}
+
+// ══════════════════════════════════
+// PRACTICE
+// ══════════════════════════════════
+function openPrac(t) {
+  ses.table = t;
+  document.getElementById('prac-heading').textContent = `${t} Times Table`;
+  document.getElementById('prac-heading').style.color = TC[t];
+  // show practice inner, hide others
+  hidePracViews();
+  document.getElementById('prac-inner').style.display = 'flex';
+  document.getElementById('prac-inner').style.flexDirection = 'column';
+  showPage('pg-prac');
+  document.querySelectorAll('.mtab').forEach(b => b.classList.toggle('on', b.dataset.m==='tables'));
+  startSes('tables');
+}
+
+function hidePracViews() {
+  document.getElementById('prac-inner').style.display = 'none';
+  document.getElementById('chant-wrap').style.display = 'none';
+  document.getElementById('res-wrap').style.display = 'none';
+}
+
+function setMode(m) {
+  document.querySelectorAll('.mtab').forEach(b => b.classList.toggle('on', b.dataset.m===m));
+  if (m === 'chant') { showChant(); return; }
+  hidePracViews();
+  document.getElementById('prac-inner').style.display = 'flex';
+  document.getElementById('prac-inner').style.flexDirection = 'column';
+  startSes(m);
+}
+
+function showChant() {
+  hidePracViews();
+  const t = ses.table;
+  document.getElementById('chant-heading').textContent = `${t} Times Table`;
+  document.getElementById('chant-heading').style.color = TC[t];
+  let h = '';
+  for (let i=1;i<=10;i++) {
+    h += `<div class="crow">
+      <span class="cleft" style="color:${TC[t]}">${t} × ${i}</span>
+      <span class="cans">${t*i}</span>
+    </div>`;
+  }
+  document.getElementById('chant-list').innerHTML = h;
+  document.getElementById('chant-wrap').style.display = 'flex';
+  document.getElementById('chant-wrap').style.flexDirection = 'column';
+}
+
+// Build infinite pool
+function makePool(t, mode) {
+  let pool = [];
+  if (mode === 'tables') {
+    for (let i=1;i<=10;i++) pool.push({q:`${t} × ${i} = ?`, a:t*i});
+  } else if (mode === 'reverse') {
+    for (let i=1;i<=10;i++) pool.push({q:`${t} × ___ = ${t*i}`, a:i, hint:'What goes in the blank?'});
+  } else if (mode === 'words') {
+    for (let i=1;i<=10;i++) pool.push({q:`${t} × ${i} = ?`, a:t*i});
+    (WP[t]||[]).forEach(p => pool.push({q:p.q, a:p.a, word:true}));
+  }
+  return shuf(pool);
+}
+
+function startSes(mode) {
+  ses.mode = mode;
+  ses.pool = makePool(ses.table, mode);
+  ses.idx = 0;
+  ses.correct = 0;
+  ses.total = 0;
+  updScores();
+  nextQ();
+}
+
+function getNextQ() {
+  if (ses.idx >= ses.pool.length) {
+    ses.pool = shuf(ses.pool); ses.idx = 0;
+  }
+  return ses.pool[ses.idx++];
+}
+
+function nextQ() {
+  const q = getNextQ();
+  ses.cq = q;
+
+  // Render question — clear word text first
+  document.getElementById('qtext').textContent = '';
+  document.getElementById('qword').style.display = 'none';
+  document.getElementById('qword').innerHTML = '';
+
+  if (q.word) {
+    document.getElementById('qword').innerHTML = q.q.replace(/(\d+)/g, '<b>$1</b>');
+    document.getElementById('qword').style.display = 'block';
+  } else {
+    document.getElementById('qtext').textContent = q.q;
+  }
+  document.getElementById('qhint').textContent = q.hint || '';
+
+  // Reset input
+  const inp = document.getElementById('ansinp');
+  inp.value = '';
+  inp.className = '';
+  inp.disabled = false;
+  document.getElementById('gobtn').disabled = false;
+
+  // Clear feedback WITHOUT moving anything
+  const fb = document.getElementById('fbtext');
+  fb.textContent = '';
+  fb.className = '';
+
+  setTimeout(() => inp.focus(), 40);
+}
+
+function doSubmit() {
+  const inp = document.getElementById('ansinp');
+  const v = parseInt(inp.value);
+  if (isNaN(v) || inp.disabled) return;
+
+  inp.disabled = true;
+  document.getElementById('gobtn').disabled = true;
+  ses.total++;
+
+  const fb = document.getElementById('fbtext');
+
+  if (v === ses.cq.a) {
+    inp.className = 'ok';
+    ses.correct++;
+    fb.textContent = pickOk();
+    fb.className = 'show ok';
+    document.getElementById('qcard').classList.add('pop');
+    setTimeout(() => document.getElementById('qcard').classList.remove('pop'), 220);
+    if (ses.correct % 5 === 0) burst();
+    updScores();
+    // check end condition: at least MIN_QS done AND pct >= TARGET_PCT
+    if (ses.total >= MIN_QS && pct() >= TARGET_PCT) {
+      setTimeout(showResults, 600);
+    } else {
+      setTimeout(nextQ, 700);
+    }
+  } else {
+    inp.className = 'no';
+    inp.classList.add('shake');
+    setTimeout(() => inp.classList.remove('shake'), 220);
+    fb.textContent = `The answer is ${ses.cq.a} 💡`;
+    fb.className = 'show no';
+    updScores();
+    setTimeout(() => {
+      inp.value = '';
+      inp.className = '';
+      inp.disabled = false;
+      document.getElementById('gobtn').disabled = false;
+      setTimeout(nextQ, 80);
+    }, 950);
+  }
+}
+
+function pickOk() {
+  return ['Great! ✓','Correct! ⭐','Yes! 🌟','Brilliant! 🎉','Perfect! ✨','Amazing! 🏆','Well done! ✓'][Math.floor(Math.random()*7)];
+}
+
+function updScores() {
+  const p = pct();
+  document.getElementById('sc-cor').textContent = ses.correct;
+  document.getElementById('sc-tot').textContent = ses.total;
+  document.getElementById('sc-pct').textContent = p + '%';
+  document.getElementById('progfill').style.width = Math.min(p, 100) + '%';
+  document.getElementById('prognum').textContent = p + '%  (need 90%)';
+}
+
+function showResults() {
+  const t = ses.table, p = pct();
+  const stars = p>=90?3:p>=70?2:p>=50?1:0;
+  if (!S.prog[t]) S.prog[t]={stars:0,bestPct:0,sessions:0};
+  S.prog[t].stars = Math.max(S.prog[t].stars, stars);
+  S.prog[t].bestPct = Math.max(S.prog[t].bestPct, p);
+  S.prog[t].sessions++;
+  S.stars += stars;
+  saveState(); updHdr();
+
+  hidePracViews();
+  document.getElementById('res-wrap').style.display = 'flex';
+  document.getElementById('res-wrap').style.flexDirection = 'column';
+
+  document.getElementById('res-ico').textContent = p>=90?'🏆':p>=70?'⭐':'💪';
+  document.getElementById('res-title').textContent = p>=90?'90%! Champion!':p>=70?'Well done!':'Keep trying!';
+  document.getElementById('res-sub').textContent = `${ses.correct} correct out of ${ses.total} questions\nScore: ${p}%`;
+  document.getElementById('res-stars').textContent = '⭐'.repeat(stars) || '—';
+  if (p >= 90) burst();
+}
+
+function retryPrac() {
+  hidePracViews();
+  document.getElementById('prac-inner').style.display = 'flex';
+  document.getElementById('prac-inner').style.flexDirection = 'column';
+  startSes(ses.mode);
+}
+
+// ══════════════════════════════════
+// STAR ROUND
+// ══════════════════════════════════
+let star = { qs:[], idx:0, correct:0, t0:0, iv:null };
+
+function goStarSetup() {
+  showPage('pg-star');
+  document.getElementById('star-setup').style.display = 'block';
+  document.getElementById('star-active-wrap').style.display = 'none';
+  document.getElementById('star-res-wrap').style.display = 'none';
+  const cb = document.getElementById('star-cbs'); cb.innerHTML = '';
+  S.unlocked.forEach(t => {
+    const lbl = document.createElement('label');
+    lbl.style.cssText = 'display:flex;align-items:center;gap:5px;background:#fff;border:2px solid #e5e0da;border-radius:9px;padding:6px 12px;font-weight:800;font-size:.85rem;cursor:pointer;';
+    lbl.innerHTML = `<input type="checkbox" id="scb-${t}" checked style="accent-color:${TC[t]};width:15px;height:15px;"> <span style="color:${TC[t]}">${t}×</span>`;
+    cb.appendChild(lbl);
+  });
+}
+
+function beginStar() {
+  const sel = S.unlocked.filter(t => document.getElementById(`scb-${t}`)?.checked);
+  if (!sel.length) { alert('Pick at least one table!'); return; }
+  const pool = [];
+  sel.forEach(t => { for (let i=1;i<=10;i++) pool.push({q:`${t} × ${i} = ?`, a:t*i}); });
+  star.qs = shuf(pool).slice(0, 10);
+  star.idx = 0; star.correct = 0; star.t0 = Date.now();
+  document.getElementById('star-setup').style.display = 'none';
+  document.getElementById('star-active-wrap').style.display = 'flex';
+  document.getElementById('star-active-wrap').style.flexDirection = 'column';
+  document.getElementById('star-res-wrap').style.display = 'none';
+  clearInterval(star.iv);
+  star.iv = setInterval(() => document.getElementById('star-timer').textContent = fmt(Date.now()-star.t0), 100);
+  showStarQ();
+}
+
+function showStarQ() {
+  const q = star.qs[star.idx];
+  document.getElementById('star-qtext').textContent = q.q;
+  document.getElementById('star-qn').textContent = star.idx + 1;
+  document.getElementById('star-co').textContent = star.correct;
+  const inp = document.getElementById('star-ansinp');
+  inp.value = ''; inp.className = ''; inp.disabled = false;
+  document.getElementById('star-fbtext').textContent = '';
+  document.getElementById('star-fbtext').className = '';
+  setTimeout(() => inp.focus(), 40);
+}
+
+function doStarSubmit() {
+  const inp = document.getElementById('star-ansinp');
+  const v = parseInt(inp.value);
+  if (isNaN(v) || inp.disabled) return;
+  inp.disabled = true;
+  const q = star.qs[star.idx];
+  const fb = document.getElementById('star-fbtext');
+  if (v === q.a) {
+    inp.className = 'ok'; star.correct++;
+    fb.textContent = pickOk(); fb.className = 'show ok';
+    setTimeout(starAdv, 600);
+  } else {
+    inp.className = 'no';
+    fb.textContent = `Answer: ${q.a}`; fb.className = 'show no';
+    setTimeout(starAdv, 900);
+  }
+}
+
+function starAdv() {
+  star.idx++;
+  if (star.idx >= 10) endStar();
+  else showStarQ();
+}
+
+function endStar() {
+  clearInterval(star.iv);
+  const el = Date.now() - star.t0, p = star.correct/10;
+  const stars = p>=.9?3:p>=.7?2:p>=.5?1:0;
+  if (!S.starBest || el < S.starBest) S.starBest = el;
+  S.stars += stars; saveState(); updHdr();
+  document.getElementById('star-active-wrap').style.display = 'none';
+  document.getElementById('star-res-wrap').style.display = 'flex';
+  document.getElementById('star-res-wrap').style.flexDirection = 'column';
+  document.getElementById('sr-ico').textContent = p>=.9?'🏆':p>=.7?'⭐':'💪';
+  document.getElementById('sr-title').textContent = p>=.9?'Star Champion!':p>=.7?'Brilliant!':'Keep going!';
+  document.getElementById('sr-sub').textContent = `${star.correct} / 10 correct  ·  Time: ${fmt(el)}`;
+  document.getElementById('sr-best').textContent = `Personal best: ${fmt(S.starBest)}`;
+  document.getElementById('sr-stars').textContent = '⭐'.repeat(stars)||'—';
+  if (p >= .9) burst();
+}
+
+// ══════════════════════════════════
+// UNLOCK
+// ══════════════════════════════════
+function doUnlock() {
+  const v = parseInt(document.getElementById('uinp').value);
+  const msg = document.getElementById('umsg');
+  if (!v||v<2||v>9) { msg.textContent='Enter a number 2 to 9.'; msg.style.color='#dc2626'; return; }
+  if (S.unlocked.includes(v)) { msg.textContent=`The ${v} table is already unlocked!`; msg.style.color='#15803d'; return; }
+  S.unlocked.push(v); S.unlocked.sort((a,b)=>a-b); saveState();
+  buildGrid();
+  msg.textContent = `✓ The ${v} times table is now unlocked for Amoha!`;
+  msg.style.color = '#15803d';
+  document.getElementById('uinp').value = '';
+  setTimeout(() => msg.textContent = '', 3000);
+}
+
+// ══════════════════════════════════
+// UTILS
+// ══════════════════════════════════
+function updHdr() { document.getElementById('hstars').textContent = S.stars; }
+
+function resetAll() {
+  S = {unlocked:[2,3],stars:0,prog:{},starBest:null};
+  saveState(); buildGrid(); updHdr();
+}
+
+function burst() {
+  const w = document.getElementById('cc');
+  const cols = ['#f59e0b','#d95f0a','#15803d','#1b5fa3','#7c28be','#be1870'];
+  for (let i=0;i<28;i++) {
+    const p = document.createElement('div'); p.className = 'cp';
+    p.style.cssText = `left:${Math.random()*100}vw;background:${cols[~~(Math.random()*6)]};animation-delay:${Math.random()*.5}s;animation-duration:${1.4+Math.random()*.7}s;transform:rotate(${Math.random()*360}deg)`;
+    w.appendChild(p); setTimeout(()=>p.remove(), 2500);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
