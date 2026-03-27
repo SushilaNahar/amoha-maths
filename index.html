@@ -128,9 +128,9 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
 /* TOP SECTION — fixed, never resizes */
 #ptop{
   flex:0 0 auto;
-  padding:8px 14px 0;
+  padding:5px 14px 0;
   background:var(--pw);
-  display:flex;flex-direction:column;gap:5px;
+  display:flex;flex-direction:column;gap:4px;
 }
 .back-row{display:flex;align-items:center;gap:8px;}
 .backbtn{background:none;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:var(--muted);cursor:pointer;}
@@ -149,22 +149,24 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
 #sbar-row{
   flex:0 0 auto;
   padding:0 14px;
-  display:flex;flex-direction:column;gap:4px;
+  display:flex;flex-direction:column;gap:3px;
   background:var(--pw);
 }
-.strips{display:flex;justify-content:space-around;background:var(--w);border:2px solid var(--bdr);border-radius:11px;padding:7px 4px;}
+.strips{display:flex;justify-content:space-around;background:var(--w);border:2px solid var(--bdr);border-radius:11px;padding:5px 4px;}
 .si{text-align:center;}
-.sv{font-family:'Baloo 2',sans-serif;font-size:1.1rem;font-weight:900;line-height:1;}
-.sl{font-size:.57rem;font-weight:800;color:var(--muted);text-transform:uppercase;margin-top:1px;}
-#pbar-wrap{padding:0 0 2px;}
-#pbar-lbl{display:flex;justify-content:space-between;font-size:.63rem;font-weight:800;color:var(--muted);margin-bottom:3px;}
-#pbar-track{height:7px;background:var(--pl);border-radius:99px;overflow:hidden;}
+.sv{font-family:'Baloo 2',sans-serif;font-size:1rem;font-weight:900;line-height:1;}
+.sl{font-size:.52rem;font-weight:800;color:var(--muted);text-transform:uppercase;margin-top:1px;}
+#pbar-wrap{padding:0;}
+#pbar-lbl{display:flex;justify-content:space-between;font-size:.58rem;font-weight:800;color:var(--muted);margin-bottom:2px;}
+#pbar-track{height:6px;background:var(--pl);border-radius:99px;overflow:hidden;}
 #pbar-fill{height:100%;background:var(--p);border-radius:99px;width:0%;transition:width .3s;}
 
-/* ── QUESTION ZONE — fixed height, NEVER changes ── */
+/* ── QUESTION ZONE — flex proportion, scales to any phone ── */
 #qzone{
-  flex:0 0 130px;   /* FIXED HEIGHT — question never moves */
-  padding:6px 14px 0;
+  flex:0 0 22vmax;
+  max-height:160px;
+  min-height:90px;
+  padding:5px 14px 0;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -183,7 +185,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
 
 /* ── FEEDBACK — fixed height, never causes shift ── */
 #fbzone{
-  flex:0 0 28px;
+  flex:0 0 24px;
   display:flex;align-items:center;justify-content:center;
   background:var(--pw);
 }
@@ -192,23 +194,24 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
 #fbtext.ok{color:#15803d;}
 #fbtext.no{color:#dc2626;}
 
-/* ── ANSWER ZONE — takes all remaining space ── */
+/* ── ANSWER ZONE — takes all remaining space, numpad fills it ── */
 #azone{
   flex:1;
-  padding:6px 14px 10px;
+  min-height:0;
+  padding:4px 14px 8px;
   display:flex;flex-direction:column;
   justify-content:flex-end;
   background:var(--pw);
-  gap:7px;
+  gap:4px;
   overflow:hidden;
 }
 
 /* ── NUMBER PAD (replaces all text inputs) ── */
 .numpad-wrap{display:flex;flex-direction:column;gap:5px;width:100%;flex-shrink:0;}
 .numpad-display{
-  width:100%;height:58px;flex-shrink:0;
+  width:100%;height:52px;flex-shrink:0;
   border:3px solid var(--bdr);border-radius:13px;
-  font-family:'Baloo 2',sans-serif;font-size:2.2rem;font-weight:900;
+  font-family:'Baloo 2',sans-serif;font-size:2rem;font-weight:900;
   text-align:center;color:var(--txt);background:var(--w);
   display:flex;align-items:center;justify-content:center;
   transition:border-color .15s,background .15s;
@@ -217,14 +220,22 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
 .numpad-display.ok{border-color:#15803d;background:#f0fdf4;color:#15803d;}
 .numpad-display.no{border-color:#dc2626;background:#fef2f2;color:#dc2626;}
 .numpad-display.empty{color:#ccc;}
-.numpad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.numpad-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(4,1fr);
+  gap:4px;
+  flex:1;  /* fills all remaining space in azone */
+}
 .npbtn{
-  height:46px;border-radius:11px;border:2px solid var(--bdr);
+  height:100%;min-height:38px;max-height:56px;
+  border-radius:10px;border:2px solid var(--bdr);
   background:var(--w);font-family:'Baloo 2',sans-serif;
-  font-size:1.3rem;font-weight:900;color:var(--txt);cursor:pointer;
+  font-size:1.2rem;font-weight:900;color:var(--txt);cursor:pointer;
   transition:background .1s,transform .08s;
   -webkit-tap-highlight-color:transparent;
   user-select:none;
+  display:flex;align-items:center;justify-content:center;
 }
 .npbtn:active{background:var(--pl);transform:scale(.94);}
 .npbtn.np-del{background:var(--pl);color:var(--p);font-size:1.1rem;}
@@ -316,16 +327,17 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
    STAR ROUND PAGE
 ═══════════════════════════════════════ */
 #pg-star{padding:14px;gap:11px;}
-#star-active{position:absolute;inset:0;display:none;flex-direction:column;padding:10px 14px 10px;gap:6px;background:var(--pw);}
-#star-timer{flex:0 0 auto;font-family:'Baloo 2',sans-serif;font-size:2.6rem;font-weight:900;color:var(--p);text-align:center;}
-#star-qcard{flex:0 0 110px;background:var(--w);border:2px solid var(--bdr);border-radius:var(--r);display:flex;align-items:center;justify-content:center;}
-#star-qtext{font-family:'Baloo 2',sans-serif;font-size:3rem;font-weight:900;text-align:center;}
-#star-fbrow{flex:0 0 26px;display:flex;align-items:center;justify-content:center;}
-#star-fbtext{font-family:'Baloo 2',sans-serif;font-size:1.1rem;font-weight:900;opacity:0;transition:opacity .1s;}
+#star-active{position:absolute;inset:0;display:none;flex-direction:column;padding:8px 14px 8px;gap:4px;background:var(--pw);}
+#star-timer{flex:0 0 auto;font-family:'Baloo 2',sans-serif;font-size:2.2rem;font-weight:900;color:var(--p);text-align:center;}
+#star-qcard{flex:0 0 22vmax;max-height:150px;min-height:80px;background:var(--w);border:2px solid var(--bdr);border-radius:var(--r);display:flex;align-items:center;justify-content:center;}
+#star-qtext{font-family:'Baloo 2',sans-serif;font-size:2.8rem;font-weight:900;text-align:center;}
+#star-fbrow{flex:0 0 22px;display:flex;align-items:center;justify-content:center;}
+#star-fbtext{font-family:'Baloo 2',sans-serif;font-size:1rem;font-weight:900;opacity:0;transition:opacity .1s;}
 #star-fbtext.show{opacity:1;}
 #star-fbtext.ok{color:#15803d;}
 #star-fbtext.no{color:#dc2626;}
-#star-gobtn{display:none;}/* hidden — numpad handles submit */
+#star-numpad-wrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:4px;}
+#star-gobtn{display:none;}
 #star-res{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px 14px;background:var(--pw);}
 
 /* ═══════════════════════════════════════
@@ -443,7 +455,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
         <!-- ANSWER ZONE — fills remaining space, answer UI at bottom -->
         <div id="azone">
           <!-- Number pad (no keyboard!) -->
-          <div id="std-area" style="display:flex;flex-direction:column;gap:5px;">
+          <div id="std-area" style="display:flex;flex-direction:column;gap:4px;flex:1;min-height:0;">
             <div class="numpad-display empty" id="np-display">?</div>
             <div class="numpad-grid" id="np-grid"></div>
           </div>
@@ -526,8 +538,10 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
         </div>
         <div id="star-qcard"><div id="star-qtext"></div></div>
         <div id="star-fbrow"><div id="star-fbtext"></div></div>
-        <div class="numpad-display empty" id="star-display">?</div>
-        <div class="numpad-grid" id="star-np-grid"></div>
+        <div id="star-numpad-wrap">
+          <div class="numpad-display empty" id="star-display">?</div>
+          <div class="numpad-grid" id="star-np-grid"></div>
+        </div>
         <button id="star-gobtn" style="display:none"></button>
       </div>
       <div id="star-res">
