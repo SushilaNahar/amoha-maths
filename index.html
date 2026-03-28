@@ -294,12 +294,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
 .oddbtn.right{background:var(--pl);border-color:var(--p);color:var(--p);}
 .oddbtn.wrong{background:#fef2f2;border-color:#dc2626;color:#dc2626;}
 
-/* SPEED ROUND */
-#speed-area{display:none;flex-direction:column;gap:6px;flex-shrink:0;}
-.speed-timer-row{display:flex;align-items:center;justify-content:center;gap:8px;}
-.speed-timer{font-family:'Baloo 2',sans-serif;font-size:1.6rem;font-weight:900;color:var(--p);}
-.speed-q-mini{font-family:'Baloo 2',sans-serif;font-size:1.5rem;font-weight:900;text-align:center;padding:10px;background:var(--w);border:2px solid var(--bdr);border-radius:12px;}
-#speed-gobtn{display:none;}/* hidden — numpad handles */
+/* speed timer shown in score strip */
 
 /* CHANT */
 #chant-shell{position:absolute;inset:0;display:none;flex-direction:column;padding:10px 14px;}
@@ -419,6 +414,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
             <button class="mtab" data-m="tf" onclick="setMode('tf')">T / F</button>
             <button class="mtab" data-m="mc" onclick="setMode('mc')">🔘 Choice</button>
             <button class="mtab" data-m="seq" onclick="setMode('seq')">… Next</button>
+            <button class="mtab" data-m="words" onclick="setMode('words')">🛒 Words</button>
             <button class="mtab" data-m="match" onclick="setMode('match')">🔗 Match</button>
             <button class="mtab" data-m="odd" onclick="setMode('odd')">🎯 Odd</button>
             <button class="mtab" data-m="op" onclick="setMode('op')">× ÷ Op</button>
@@ -433,6 +429,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
             <div class="si"><div class="sv" id="sc-c" style="color:var(--p)">0</div><div class="sl">Correct</div></div>
             <div class="si"><div class="sv" id="sc-t">0</div><div class="sl">Done</div></div>
             <div class="si"><div class="sv" id="sc-p" style="color:var(--pm)">0%</div><div class="sl">Score</div></div>
+            <div class="si" id="speed-timer-cell" style="display:none;"><div class="sv" id="speed-timer" style="color:var(--p)">30s</div><div class="sl">Time</div></div>
           </div>
           <div id="pbar-wrap">
             <div id="pbar-lbl"><span>Progress to 90%</span><span id="pbar-num">0%</span></div>
@@ -477,16 +474,6 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
           <!-- Missing operator -->
           <div id="op-area" style="display:none;flex-direction:column;gap:7px;">
             <div style="display:flex;gap:7px;" id="op-btns"></div>
-          </div>
-          <!-- Speed round -->
-          <div id="speed-area">
-            <div class="speed-timer-row">
-              <div class="speed-timer" id="speed-timer">5.0s</div>
-              <div style="font-size:.8rem;font-weight:800;color:var(--muted);">Answer 5 sums!</div>
-            </div>
-            <div class="speed-q-mini" id="speed-q"></div>
-            <div class="numpad-display empty" id="speed-display">?</div>
-            <div class="numpad-grid" id="speed-np-grid"></div>
           </div>
         </div>
       </div>
@@ -711,7 +698,7 @@ function doChant(){
 // HIDE ALL ANSWER UIS
 // ═══════════════════════════════════════════════
 function hideAllA(){
-  ['std-area','tf-area','mc-area','match-area','odd-area','op-area','speed-area']
+  ['std-area','tf-area','mc-area','match-area','odd-area','op-area']
     .forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
 }
 
@@ -789,6 +776,8 @@ function rnd(a,b){return a+Math.floor(Math.random()*(b-a+1));}
 function startSes(mode){
   ses.mode=mode;ses.pool=makePool(ses.table,mode,ses.mixed);
   ses.idx=0;ses.correct=0;ses.total=0;
+  clearInterval(speedState.timer);
+  document.getElementById('speed-timer-cell').style.display='none';
   updScores();hideAllA();
   if(mode==='speed'){startSpeed();return;}
   nextQ();
@@ -957,58 +946,72 @@ function startSpeed(){
   const ts=ses.mixed?S.unlocked:[ses.table];
   const pool=[];ts.forEach(tb=>{for(let i=1;i<=10;i++)pool.push({q:`${tb} × ${i} = ?`,a:tb*i});});
   speedState.qs=shuf(pool).slice(0,5);speedState.idx=0;speedState.correct=0;
-  const a=document.getElementById('speed-area');a.style.display='flex';a.style.flexDirection='column';
-  document.getElementById('qtext').textContent='5 sums as fast as you can!';
-  document.getElementById('qhint').textContent='';clrFb();
-  showSpeedQ();
+  hideAllA();
+  const a=document.getElementById('std-area');a.style.display='flex';a.style.flexDirection='column';
+  resetNumpad('np-display',pracVal);
+  clrFb();
+  // Show timer in score strip
+  document.getElementById('speed-timer-cell').style.display='block';
   speedState.timeLeft=30;
   clearInterval(speedState.timer);
   speedState.timer=setInterval(()=>{
     speedState.timeLeft-=0.1;
-    document.getElementById('speed-timer').textContent=speedState.timeLeft.toFixed(1)+'s';
+    const t=document.getElementById('speed-timer');
+    if(t)t.textContent=speedState.timeLeft.toFixed(1)+'s';
     if(speedState.timeLeft<=0){clearInterval(speedState.timer);endSpeed();}
   },100);
+  showSpeedQ();
 }
 function showSpeedQ(){
   if(speedState.idx>=speedState.qs.length){endSpeed();return;}
   const q=speedState.qs[speedState.idx];
-  document.getElementById('speed-q').textContent=q.q;
-  resetNumpad('speed-display',speedVal);
+  // Show question in the main qcard
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('qword').style.display='none';
+  document.getElementById('qhint').textContent=
+    `⚡ Speed! Sum ${speedState.idx+1} of 5  ·  ${speedState.timeLeft.toFixed(0)}s left`;
+  resetNumpad('np-display',pracVal);
+  document.querySelectorAll('#np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
 }
 function doSpeedSubmit(){
-  const v=parseInt(speedVal.v);if(isNaN(v))return;
+  const v=parseInt(pracVal.v);if(isNaN(v))return;
   const q=speedState.qs[speedState.idx];
   const ok=v===q.a;
-  setNumpadState('speed-display', ok?'ok':'no');
-  if(ok){speedState.correct++;ses.correct++;ses.total++;}
-  else{ses.total++;}
-  updScores();speedState.idx++;
+  setNumpadState('np-display', ok?'ok':'no');
+  document.querySelectorAll('#np-grid .npbtn').forEach(b=>b.style.pointerEvents='none');
+  if(ok){speedState.correct++;ses.correct++;setFb(pickOk(),'ok');}
+  else{setFb(`Answer: ${q.a} 💡`,'no');}
+  ses.total++;updScores();speedState.idx++;
   setTimeout(()=>{
-    resetNumpad('speed-display',speedVal);
+    resetNumpad('np-display',pracVal);
+    document.querySelectorAll('#np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
     if(speedState.idx>=speedState.qs.length){clearInterval(speedState.timer);endSpeed();}
     else showSpeedQ();
-  },300);
+  },600);
 }
 function endSpeed(){
   clearInterval(speedState.timer);
-  hideAllA();
+  document.getElementById('speed-timer-cell').style.display='none';
   const p=cpct();
-  document.getElementById('qtext').textContent=`Speed done! ${speedState.correct}/5`;
-  setFb(speedState.correct===5?'Perfect! 🏆':'Well done!','ok');
+  document.getElementById('qtext').textContent=`Speed done!  ${speedState.correct} / 5`;
+  document.getElementById('qhint').textContent='';
+  setFb(speedState.correct===5?'Perfect! 🏆':speedState.correct>=3?'Well done!':'Keep going!','ok');
   updScores();
-  if(ses.total>=MINQS&&p>=TARGET)setTimeout(showResults,700);
-  else{
-    // Start new speed round after brief pause
-    setTimeout(()=>{
-      speedState.qs=shuf(speedState.qs);speedState.idx=0;
-      const a=document.getElementById('speed-area');a.style.display='flex';a.style.flexDirection='column';
-      showSpeedQ();speedState.timeLeft=30;
-      speedState.timer=setInterval(()=>{
-        speedState.timeLeft-=0.1;document.getElementById('speed-timer').textContent=speedState.timeLeft.toFixed(1)+'s';
-        if(speedState.timeLeft<=0){clearInterval(speedState.timer);endSpeed();}
-      },100);
-    },1200);
-  }
+  if(ses.total>=MINQS&&p>=TARGET){setTimeout(showResults,700);return;}
+  // Restart another speed round
+  setTimeout(()=>{
+    speedState.qs=shuf(speedState.qs);speedState.idx=0;speedState.correct=0;
+    const a=document.getElementById('std-area');a.style.display='flex';a.style.flexDirection='column';
+    resetNumpad('np-display',pracVal);
+    clrFb();
+    speedState.timeLeft=30;
+    speedState.timer=setInterval(()=>{
+      speedState.timeLeft-=0.1;
+      const t=document.getElementById('speed-timer');if(t)t.textContent=speedState.timeLeft.toFixed(1)+'s';
+      if(speedState.timeLeft<=0){clearInterval(speedState.timer);endSpeed();}
+    },100);
+    showSpeedQ();
+  },1400);
 }
 
 // ═══════════════════════════════════════════════
@@ -1174,7 +1177,7 @@ function buildNumpad(gridId, displayId, submitFn, valRef){
 // Shared val objects (so we can pass by reference)
 const pracVal = {v:''};
 const starVal = {v:''};
-const speedVal = {v:''};
+// pracVal and starVal handle all numpad input
 
 function resetNumpad(displayId, valObj){
   valObj.v = '';
@@ -1188,9 +1191,8 @@ function setNumpadState(displayId, cls){
 }
 
 init();
-buildNumpad('np-grid','np-display', doSubmit, pracVal);
+buildNumpad('np-grid','np-display', ()=>{ ses.mode==='speed'?doSpeedSubmit():doSubmit(); }, pracVal);
 buildNumpad('star-np-grid','star-display', doStarSubmit, starVal);
-buildNumpad('speed-np-grid','speed-display', doSpeedSubmit, speedVal);
 </script>
 </body>
 </html>
