@@ -386,6 +386,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
         <button class="hbtn hbtn-p" onclick="goStarSetup()">🏆 Star Round</button>
       </div>
       <button class="hbtn hbtn-outline" onclick="goProg()">📊 My Progress</button>
+      <button class="hbtn" style="background:var(--pl);color:var(--p);border:2px solid var(--bdr);" onclick="goMental()">🧠 Mental Maths</button>
       <div class="unlock-box">
         <h3>🔐 Parent — Unlock Next Table</h3>
         <div class="urow">
@@ -563,6 +564,91 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
       </div>
     </div>
 
+    <!-- ══════════ MENTAL MATHS ══════════ -->
+    <div id="pg-mental" class="pg">
+      <!-- Setup / level intro -->
+      <div id="mm-setup" style="padding:14px;display:flex;flex-direction:column;gap:11px;">
+        <button class="backbtn" onclick="goHome()">← Back</button>
+        <div class="welcome">
+          <div class="ws">🧠</div>
+          <h2>Mental Maths!</h2>
+          <p id="mm-setup-desc">Work through the levels at your own pace.<br>The questions grow with you!</p>
+        </div>
+        <div id="mm-level-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
+
+        <div class="unlock-box" style="margin-top:4px;">
+          <h3>🔐 Parent — Unlock Any Level</h3>
+          <div class="urow">
+            <input class="uinput" id="mm-uinp" type="number" placeholder="Level (1–20)" min="1" max="20" inputmode="numeric">
+            <button class="ubtn" onclick="doMmUnlock()">Unlock</button>
+          </div>
+          <div class="umsg" id="mm-umsg"></div>
+        </div>
+      </div>
+
+      <!-- Active session — reuses same fixed layout as practice -->
+      <div id="mm-shell" style="display:none;position:absolute;inset:0;flex-direction:column;">
+        <div style="flex:0 0 auto;padding:5px 14px 0;display:flex;flex-direction:column;gap:4px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="backbtn" onclick="exitMental()">← Back</button>
+            <div id="mm-heading" style="font-family:'Baloo 2',sans-serif;font-size:1rem;font-weight:900;color:var(--p);"></div>
+          </div>
+          <!-- Score strip -->
+          <div class="strips">
+            <div class="si"><div class="sv" id="mm-sc-c" style="color:var(--p)">0</div><div class="sl">Correct</div></div>
+            <div class="si"><div class="sv" id="mm-sc-t">0</div><div class="sl">Done</div></div>
+            <div class="si"><div class="sv" id="mm-streak" style="color:var(--pm)">0🔥</div><div class="sl">Streak</div></div>
+          </div>
+          <!-- Adaptive progress indicator -->
+          <div id="mm-bar-wrap">
+            <div id="mm-bar-lbl" style="display:flex;justify-content:space-between;font-size:.62rem;font-weight:800;color:var(--muted);margin-bottom:2px;">
+              <span id="mm-level-lbl">Level 1</span><span id="mm-bar-num">0 / 3</span>
+            </div>
+            <div style="height:6px;background:var(--pl);border-radius:99px;overflow:hidden;">
+              <div id="mm-bar-fill" style="height:100%;background:var(--p);border-radius:99px;width:0%;transition:width .3s;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question zone — fixed, never moves -->
+        <div style="flex:0 0 22vmax;max-height:160px;min-height:90px;padding:5px 14px 0;display:flex;align-items:center;justify-content:center;">
+          <div id="mm-qcard" style="width:100%;height:100%;background:var(--w);border:2px solid var(--bdr);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 12px;text-align:center;">
+            <div id="mm-qtext" style="font-family:'Baloo 2',sans-serif;font-size:2.4rem;font-weight:900;line-height:1.1;"></div>
+            <div id="mm-qhint" style="font-size:.7rem;color:var(--muted);margin-top:3px;"></div>
+          </div>
+        </div>
+
+        <!-- Feedback — fixed height -->
+        <div style="flex:0 0 24px;display:flex;align-items:center;justify-content:center;">
+          <div id="mm-fb" style="font-family:'Baloo 2',sans-serif;font-size:1.1rem;font-weight:900;opacity:0;transition:opacity .12s;"></div>
+        </div>
+
+        <!-- Answer zone — fills remaining, numpad at bottom -->
+        <div style="flex:1;min-height:0;padding:4px 14px 8px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;overflow:hidden;">
+          <div id="mm-std-area" style="display:flex;flex-direction:column;gap:4px;flex:1;min-height:0;">
+            <div class="numpad-display empty" id="mm-display">?</div>
+            <div class="numpad-grid" id="mm-np-grid"></div>
+          </div>
+          <!-- MC area for mental maths -->
+          <div id="mm-mc-area" style="display:none;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="mm-res" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;padding:20px 14px;background:var(--pw);">
+        <div class="rcard">
+          <div class="rico" id="mm-res-ico"></div>
+          <div class="rtitle" id="mm-res-title" style="color:var(--p);"></div>
+          <div class="rsub" id="mm-res-sub"></div>
+          <div class="rstars" id="mm-res-stars"></div>
+          <div class="rbtns">
+            <button class="rbtn rbtn-p" onclick="retryMental()">🔄 Try Again</button>
+            <button class="rbtn rbtn-o" onclick="exitMental()">🏠 Home</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /mid -->
 
   <div id="botnav">
@@ -690,7 +776,7 @@ function doChant(){
   const t=ses.mixed?S.unlocked[0]:ses.table;
   document.getElementById('chant-heading').textContent=`${t} Times Table`;
   let h='';
-  for(let i=1;i<=10;i++)h+=`<div class="crow"><span class="cleft">${t} × ${i}</span><span class="cans">${t*i}</span></div>`;
+  for(let i=1;i<=10;i++)h+=`<div class="crow"><span class="cleft" style="color:var(--p)">${t} × ${i}</span><span class="cans">${t*i}</span></div>`;
   document.getElementById('chant-list').innerHTML=h;
 }
 
@@ -1190,9 +1276,345 @@ function setNumpadState(displayId, cls){
   d.className = 'numpad-display ' + cls;
 }
 
+// ═══════════════════════════════════════════════
+// MENTAL MATHS — 20 adaptive levels
+// ═══════════════════════════════════════════════
+
+const MM_LEVELS = [
+  // Level 1 — Number bonds to 10
+  { name:'Number Bonds to 10', hint:'What makes 10?',
+    gen:(range)=>{ const a=rnd(1,9),b=10-a; return[{q:`${a} + ___ = 10`,a:b},{q:`___ + ${b} = 10`,a:a},{q:`10 − ${a} = ?`,a:b}]; }
+  },
+  // Level 2 — Number bonds to 20
+  { name:'Number Bonds to 20', hint:'What makes 20?',
+    gen:(range)=>{ const a=rnd(1,19),b=20-a; return[{q:`${a} + ___ = 20`,a:b},{q:`20 − ${a} = ?`,a:b},{q:`___ + ${a} = 20`,a:b}]; }
+  },
+  // Level 3 — Easy addition single digit
+  { name:'Adding Small Numbers', hint:'Add them up!',
+    gen:(range)=>{ const a=rnd(1,9),b=rnd(1,9); return[{q:`${a} + ${b} = ?`,a:a+b},{q:`${b} + ${a} = ?`,a:a+b}]; }
+  },
+  // Level 4 — Easy subtraction single digit
+  { name:'Taking Away', hint:'How many are left?',
+    gen:(range)=>{ const b=rnd(1,8),a=b+rnd(1,9); return[{q:`${a} − ${b} = ?`,a:a-b}]; }
+  },
+  // Level 5 — Doubles
+  { name:'Doubles', hint:'Double it!',
+    gen:(range)=>{ const a=rnd(1,Math.min(12,range)); return[{q:`Double ${a} = ?`,a:a*2},{q:`${a} + ${a} = ?`,a:a*2}]; }
+  },
+  // Level 6 — Near doubles
+  { name:'Near Doubles', hint:'Almost the same number!',
+    gen:(range)=>{ const a=rnd(2,Math.min(10,range)); return[{q:`${a} + ${a+1} = ?`,a:a*2+1},{q:`${a+1} + ${a} = ?`,a:a*2+1}]; }
+  },
+  // Level 7 — Add single digit to 2-digit
+  { name:'Add to a Big Number', hint:'Keep the tens, add the ones!',
+    gen:(range)=>{ const t=rnd(1,Math.min(range-1,8))*10,b=rnd(1,9); return[{q:`${t} + ${b} = ?`,a:t+b},{q:`${b} + ${t} = ?`,a:t+b}]; }
+  },
+  // Level 8 — Subtract single digit from 2-digit (no borrowing)
+  { name:'Subtract from a Big Number', hint:'Take away the ones!',
+    gen:(range)=>{ const t=rnd(2,Math.min(range,9))*10,b=rnd(1,9); return[{q:`${t+b} − ${b} = ?`,a:t},{q:`${t+b} − ${t} = ?`,a:b}]; }
+  },
+  // Level 9 — Bridging through 10
+  { name:'Bridging Through 10', hint:'Go to 10 first, then add the rest!',
+    gen:(range)=>{ const a=rnd(6,9),b=rnd(2,6); return[{q:`${a} + ${b} = ?`,a:a+b,hint:`Hint: ${a} + ${10-a} = 10, then + ${b-(10-a)}`}]; }
+  },
+  // Level 10 — Add tens
+  { name:'Adding Tens', hint:'Just add the tens!',
+    gen:(range)=>{ const a=rnd(1,Math.min(range/10,8))*10,b=rnd(1,Math.min(range/10,8))*10; return[{q:`${a} + ${b} = ?`,a:a+b}]; }
+  },
+  // Level 11 — Subtract tens
+  { name:'Subtracting Tens', hint:'Just take away the tens!',
+    gen:(range)=>{ const b=rnd(1,4)*10,a=b+rnd(1,5)*10; return[{q:`${a} − ${b} = ?`,a:a-b}]; }
+  },
+  // Level 12 — 2-digit + 2-digit no carrying
+  { name:'Adding Two Numbers', hint:'Add tens then ones!',
+    gen:(range)=>{ const a1=rnd(1,4),a2=rnd(0,4),b1=rnd(1,4),b2=rnd(0,9-a2);
+      const a=a1*10+a2,b=b1*10+b2; return[{q:`${a} + ${b} = ?`,a:a+b}]; }
+  },
+  // Level 13 — 2-digit − 2-digit no borrowing
+  { name:'Subtracting Two Numbers', hint:'Subtract tens then ones!',
+    gen:(range)=>{ const b1=rnd(1,3),b2=rnd(0,8),a1=b1+rnd(1,3),a2=b2+rnd(0,9-b2);
+      const a=a1*10+a2,b=b1*10+b2; return[{q:`${a} − ${b} = ?`,a:a-b}]; }
+  },
+  // Level 14 — Multiply by 10
+  { name:'Multiply by 10', hint:'Just add a zero!',
+    gen:(range)=>{ const a=rnd(1,Math.min(range,20)); return[{q:`${a} × 10 = ?`,a:a*10},{q:`10 × ${a} = ?`,a:a*10}]; }
+  },
+  // Level 15 — Addition with carrying
+  { name:'Addition with Carrying', hint:'Carry the ten!',
+    gen:(range)=>{ const a=rnd(15,Math.min(range,49)),b=rnd(5,20);
+      // ensure carrying happens
+      const ao=a%10,bo=b%10;
+      if(ao+bo<10){return[{q:`${a+1} + ${b} = ?`,a:a+1+b}];}
+      return[{q:`${a} + ${b} = ?`,a:a+b}]; }
+  },
+  // Level 16 — Subtraction with borrowing
+  { name:'Subtraction with Borrowing', hint:'Borrow from the tens!',
+    gen:(range)=>{ const b=rnd(5,19),a=b+rnd(10,30);
+      const ao=a%10,bo=b%10;
+      if(ao>=bo){return[{q:`${a+1} − ${b} = ?`,a:a+1-b}];}
+      return[{q:`${a} − ${b} = ?`,a:a-b}]; }
+  },
+  // Level 17 — Mixed + and −
+  { name:'Mixed Adding & Subtracting', hint:'Work it out step by step!',
+    gen:(range)=>{ const a=rnd(20,50),b=rnd(5,20),c=rnd(2,15);
+      return[{q:`${a} + ${b} − ${c} = ?`,a:a+b-c},{q:`${a} − ${c} + ${b} = ?`,a:a-c+b}]; }
+  },
+  // Level 18 — Multiply by 100
+  { name:'Multiply by 100', hint:'Add two zeros!',
+    gen:(range)=>{ const a=rnd(1,9); return[{q:`${a} × 100 = ?`,a:a*100},{q:`100 × ${a} = ?`,a:a*100}]; }
+  },
+  // Level 19 — Division basics
+  { name:'Sharing Equally', hint:'How many in each group?',
+    gen:(range)=>{ const d=rnd(2,5),q=rnd(1,10); return[{q:`${d*q} ÷ ${d} = ?`,a:q},{q:`${d*q} ÷ ${q} = ?`,a:d}]; }
+  },
+  // Level 20 — Grand mixed challenge
+  { name:'Grand Challenge!', hint:'Use everything you know!',
+    gen:(range)=>{
+      const opts=[
+        ()=>{const a=rnd(1,9),b=rnd(1,9);return{q:`${a}+${b}=?`,a:a+b};},
+        ()=>{const b=rnd(1,8),a=b+rnd(1,9);return{q:`${a}−${b}=?`,a:a-b};},
+        ()=>{const a=rnd(2,12);return{q:`Double ${a}=?`,a:a*2};},
+        ()=>{const a=rnd(1,9);return{q:`${a}×10=?`,a:a*10};},
+        ()=>{const a=rnd(1,5),b=rnd(1,5);return{q:`${a*10}+${b*10}=?`,a:(a+b)*10};},
+      ];
+      return opts.map(f=>f());
+    }
+  },
+];
+
+// ── Mental Maths State ──
+let mm = {
+  level: 0,        // 0-indexed into MM_LEVELS
+  subLevel: 0,     // adaptive difficulty within level (0-4)
+  streak: 0,       // correct in a row
+  wrongStreak: 0,  // wrong in a row
+  correct: 0,
+  total: 0,
+  cq: null,
+  active: false,
+};
+const mmVal = {v:''};
+
+// ── Compute number range from unlocked tables ──
+function mmRange(){
+  const maxTable = Math.max(...S.unlocked);
+  return maxTable * 10;
+}
+
+// ── Get level unlock status ──
+function mmLevelUnlocked(idx){
+  if(idx === 0) return true;
+  // Parent can unlock directly
+  if(S.mmUnlocked && S.mmUnlocked[idx]) return true;
+  // Or unlocked by passing previous level
+  return !!(S.mmPassed && S.mmPassed[idx-1]);
+}
+
+function goMental(){
+  showPg('pg-mental');
+  document.getElementById('mm-setup').style.display='block';
+  document.getElementById('mm-shell').style.display='none';
+  document.getElementById('mm-res').style.display='none';
+  buildMmLevelCards();
+}
+
+function buildMmLevelCards(){
+  const g = document.getElementById('mm-level-cards');
+  g.innerHTML = '';
+  MM_LEVELS.forEach((lv, idx)=>{
+    const unlocked = mmLevelUnlocked(idx);
+    const passed = !!(S.mmPassed && S.mmPassed[idx]);
+    const icon = passed ? '⭐' : (unlocked ? '▶' : '🔒');
+    const card = document.createElement('div');
+    card.style.cssText = 'background:' + (unlocked?'var(--w)':'var(--pl)') + ';border:2px solid var(--bdr);border-radius:13px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;opacity:' + (unlocked?1:0.5) + ';cursor:' + (unlocked?'pointer':'default') + ';';
+    const left = document.createElement('div');
+    const title = document.createElement('div');
+    title.style.cssText = "font-family:'Baloo 2',sans-serif;font-weight:900;font-size:.95rem;color:" + (unlocked?'var(--p)':'var(--muted)') + ';';
+    title.textContent = (unlocked?'':'🔒 ') + 'Level ' + (idx+1) + ' — ' + lv.name;
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:.7rem;color:var(--muted);font-weight:700;margin-top:2px;';
+    hint.textContent = lv.hint;
+    left.appendChild(title);
+    left.appendChild(hint);
+    const right = document.createElement('div');
+    right.style.fontSize = '1.1rem';
+    right.textContent = icon;
+    card.appendChild(left);
+    card.appendChild(right);
+    if(unlocked) card.onclick = ()=>startMmLevel(idx);
+    g.appendChild(card);
+  });
+}
+
+function startMmLevel(idx){
+  mm.level = idx;
+  mm.subLevel = 0;
+  mm.streak = 0;
+  mm.wrongStreak = 0;
+  mm.correct = 0;
+  mm.total = 0;
+  mm.active = true;
+
+  document.getElementById('mm-setup').style.display='none';
+  document.getElementById('mm-shell').style.display='flex';
+  document.getElementById('mm-shell').style.flexDirection='column';
+  document.getElementById('mm-res').style.display='none';
+  document.getElementById('mm-heading').textContent = `Level ${idx+1} — ${MM_LEVELS[idx].name}`;
+  document.getElementById('mm-std-area').style.display='flex';
+  document.getElementById('mm-std-area').style.flexDirection='column';
+  document.getElementById('mm-mc-area').style.display='none';
+  resetNumpad('mm-display', mmVal);
+  document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
+  mmUpdateBar();
+  mmNextQ();
+}
+
+function mmNextQ(){
+  const range = mmRange();
+  const lv = MM_LEVELS[mm.level];
+  const qs = lv.gen(range);
+  // pick question based on subLevel cycling
+  const q = qs[mm.total % qs.length];
+  mm.cq = q;
+
+  document.getElementById('mm-qtext').textContent = q.q;
+  document.getElementById('mm-qhint').textContent = q.hint || MM_LEVELS[mm.level].hint;
+
+  // Clear feedback
+  const fb = document.getElementById('mm-fb');
+  fb.textContent = ''; fb.style.opacity = '0';
+
+  resetNumpad('mm-display', mmVal);
+  document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
+}
+
+function doMmSubmit(){
+  const v = parseInt(mmVal.v);
+  if(isNaN(v)) return;
+
+  const ok = v === mm.cq.a;
+  document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='none');
+  setNumpadState('mm-display', ok?'ok':'no');
+
+  mm.total++;
+  const fb = document.getElementById('mm-fb');
+
+  if(ok){
+    mm.correct++;
+    mm.streak++;
+    mm.wrongStreak = 0;
+    fb.textContent = pickOk();
+    fb.style.color = '#15803d';
+    fb.style.opacity = '1';
+    document.getElementById('mm-qcard').classList.add('pop');
+    setTimeout(()=>document.getElementById('mm-qcard').classList.remove('pop'),220);
+    if(mm.streak%5===0) burst();
+
+    // Adaptive: 3 right → nudge up sub-level
+    if(mm.streak > 0 && mm.streak % 3 === 0){
+      mm.subLevel = Math.min(mm.subLevel + 1, 4);
+    }
+  } else {
+    mm.streak = 0;
+    mm.wrongStreak++;
+    fb.textContent = `Answer: ${mm.cq.a} 💡`;
+    fb.style.color = '#dc2626';
+    fb.style.opacity = '1';
+
+    // Adaptive: 2 wrong → nudge down sub-level
+    if(mm.wrongStreak >= 2){
+      mm.subLevel = Math.max(mm.subLevel - 1, 0);
+      mm.wrongStreak = 0;
+    }
+  }
+
+  mmUpdateScores();
+  mmUpdateBar();
+
+  // End condition: at least 15 questions AND accuracy >= 80%
+  const pct = Math.round(mm.correct/mm.total*100);
+  const delay = ok ? 750 : 1050;
+  setTimeout(()=>{
+    resetNumpad('mm-display', mmVal);
+    document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
+    if(mm.total >= 15 && pct >= 80){
+      mmShowResults();
+    } else {
+      mmNextQ();
+    }
+  }, delay);
+}
+
+function mmUpdateScores(){
+  document.getElementById('mm-sc-c').textContent = mm.correct;
+  document.getElementById('mm-sc-t').textContent = mm.total;
+  document.getElementById('mm-streak').textContent = mm.streak + '🔥';
+}
+
+function mmUpdateBar(){
+  // Bar shows streak progress toward next level-up (every 3)
+  const progress = (mm.streak % 3) / 3 * 100;
+  document.getElementById('mm-bar-fill').style.width = progress + '%';
+  document.getElementById('mm-bar-num').textContent = `${mm.streak % 3} / 3`;
+  document.getElementById('mm-level-lbl').textContent = `Level ${mm.level+1}`;
+}
+
+function mmShowResults(){
+  const pct = Math.round(mm.correct/mm.total*100);
+  const stars = pct>=90?3:pct>=80?2:pct>=70?1:0;
+
+  // Save pass status
+  if(!S.mmPassed) S.mmPassed = {};
+  if(pct >= 80) S.mmPassed[mm.level] = true;
+  if(!S.mmBest) S.mmBest = {};
+  S.mmBest[mm.level] = Math.max(pct, S.mmBest[mm.level]||0);
+  S.stars += stars;
+  saveS(); updHdr();
+
+  document.getElementById('mm-shell').style.display='none';
+  document.getElementById('mm-res').style.display='flex';
+  document.getElementById('mm-res').style.flexDirection='column';
+
+  const passed = pct >= 80;
+  document.getElementById('mm-res-ico').textContent = pct>=90?'🏆':pct>=80?'⭐':'💪';
+  document.getElementById('mm-res-title').textContent = pct>=90?'Brilliant!':pct>=80?'Level passed!':'Almost there!';
+  document.getElementById('mm-res-sub').textContent =
+    `${mm.correct} correct out of ${mm.total}\nScore: ${pct}%\n${passed?'Next level unlocked! 🎉':'Try again to unlock the next level'}`;
+  document.getElementById('mm-res-stars').textContent = '⭐'.repeat(stars)||'—';
+  if(pct>=80) burst();
+}
+
+function retryMental(){ startMmLevel(mm.level); }
+function doMmUnlock(){
+  const v = parseInt(document.getElementById('mm-uinp').value);
+  const msg = document.getElementById('mm-umsg');
+  if(!v || v < 1 || v > 20){
+    msg.textContent = 'Enter a level between 1 and 20.';
+    msg.style.color = '#dc2626'; return;
+  }
+  const idx = v - 1;
+  if(!S.mmUnlocked) S.mmUnlocked = {};
+  S.mmUnlocked[idx] = true;
+  saveS();
+  buildMmLevelCards();
+  msg.textContent = '✓ Level ' + v + ' unlocked for Amoha!';
+  msg.style.color = 'var(--p)';
+  document.getElementById('mm-uinp').value = '';
+  setTimeout(()=>msg.textContent='', 3000);
+}
+function exitMental(){
+  mm.active = false;
+  showPg('pg-mental');
+  document.getElementById('mm-setup').style.display='block';
+  document.getElementById('mm-shell').style.display='none';
+  document.getElementById('mm-res').style.display='none';
+  buildMmLevelCards();
+}
+
 init();
 buildNumpad('np-grid','np-display', ()=>{ ses.mode==='speed'?doSpeedSubmit():doSubmit(); }, pracVal);
 buildNumpad('star-np-grid','star-display', doStarSubmit, starVal);
+buildNumpad('mm-np-grid','mm-display', doMmSubmit, mmVal);
 </script>
 </body>
 </html>
