@@ -626,7 +626,6 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
         <!-- Answer zone — fills remaining, numpad at bottom -->
         <div style="flex:1;min-height:0;padding:4px 14px 8px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;overflow:hidden;">
           <div id="mm-std-area" style="display:flex;flex-direction:column;gap:4px;flex:1;min-height:0;">
-            <div class="numpad-display empty" id="mm-display">?</div>
             <div class="numpad-grid" id="mm-np-grid"></div>
           </div>
           <!-- MC area for mental maths -->
@@ -1463,7 +1462,7 @@ function startMmLevel(idx){
   document.getElementById('mm-std-area').style.display='flex';
   document.getElementById('mm-std-area').style.flexDirection='column';
   document.getElementById('mm-mc-area').style.display='none';
-  resetNumpad('mm-display', mmVal);
+  mmVal.v = '';
   document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
   mmUpdateBar();
   mmNextQ();
@@ -1473,19 +1472,54 @@ function mmNextQ(){
   const range = mmRange();
   const lv = MM_LEVELS[mm.level];
   const qs = lv.gen(range);
-  // pick question based on subLevel cycling
   const q = qs[mm.total % qs.length];
   mm.cq = q;
 
-  document.getElementById('mm-qtext').textContent = q.q;
+  // Render question with inline blank
+  mmRenderQ('');
+
   document.getElementById('mm-qhint').textContent = q.hint || MM_LEVELS[mm.level].hint;
 
   // Clear feedback
   const fb = document.getElementById('mm-fb');
   fb.textContent = ''; fb.style.opacity = '0';
 
-  resetNumpad('mm-display', mmVal);
+  // Reset typed value
+  mmVal.v = '';
   document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
+}
+
+// Render the question text with the blank filled by typed value
+function mmRenderQ(typed){
+  const q = mm.cq;
+  const qcard = document.getElementById('mm-qtext');
+  if(q.q.includes('___')){
+    // Split around blank and show typed value in purple box
+    const parts = q.q.split('___');
+    qcard.innerHTML = '';
+    const before = document.createElement('span');
+    before.textContent = parts[0];
+    const blank = document.createElement('span');
+    blank.id = 'mm-blank';
+    blank.style.cssText = 'display:inline-block;min-width:60px;border-bottom:4px solid var(--p);color:var(--p);padding:0 6px;margin:0 4px;font-weight:900;';
+    blank.textContent = typed || ' ';
+    const after = document.createElement('span');
+    after.textContent = parts[1] || '';
+    qcard.appendChild(before);
+    qcard.appendChild(blank);
+    qcard.appendChild(after);
+  } else {
+    // No blank — just show question and a separate answer underline below
+    qcard.innerHTML = '';
+    const qtxt = document.createElement('div');
+    qtxt.textContent = q.q;
+    const ans = document.createElement('div');
+    ans.id = 'mm-blank';
+    ans.style.cssText = 'font-size:2.6rem;border-bottom:4px solid var(--p);color:var(--p);min-width:80px;margin-top:6px;padding:0 10px;font-weight:900;';
+    ans.textContent = typed || ' ';
+    qcard.appendChild(qtxt);
+    qcard.appendChild(ans);
+  }
 }
 
 function doMmSubmit(){
@@ -1494,7 +1528,15 @@ function doMmSubmit(){
 
   const ok = v === mm.cq.a;
   document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='none');
-  setNumpadState('mm-display', ok?'ok':'no');
+
+  // Flash the blank green or red
+  const blank = document.getElementById('mm-blank');
+  if(blank){
+    blank.style.color = ok ? '#15803d' : '#dc2626';
+    blank.style.borderColor = ok ? '#15803d' : '#dc2626';
+    blank.style.background = ok ? '#f0fdf4' : '#fef2f2';
+    blank.textContent = ok ? v : v;
+  }
 
   mm.total++;
   const fb = document.getElementById('mm-fb');
@@ -1509,8 +1551,6 @@ function doMmSubmit(){
     document.getElementById('mm-qcard').classList.add('pop');
     setTimeout(()=>document.getElementById('mm-qcard').classList.remove('pop'),220);
     if(mm.streak%5===0) burst();
-
-    // Adaptive: 3 right → nudge up sub-level
     if(mm.streak > 0 && mm.streak % 3 === 0){
       mm.subLevel = Math.min(mm.subLevel + 1, 4);
     }
@@ -1520,8 +1560,8 @@ function doMmSubmit(){
     fb.textContent = `Answer: ${mm.cq.a} 💡`;
     fb.style.color = '#dc2626';
     fb.style.opacity = '1';
-
-    // Adaptive: 2 wrong → nudge down sub-level
+    // Show correct answer in blank briefly
+    if(blank) blank.textContent = mm.cq.a;
     if(mm.wrongStreak >= 2){
       mm.subLevel = Math.max(mm.subLevel - 1, 0);
       mm.wrongStreak = 0;
@@ -1531,11 +1571,10 @@ function doMmSubmit(){
   mmUpdateScores();
   mmUpdateBar();
 
-  // End condition: at least 15 questions AND accuracy >= 80%
   const pct = Math.round(mm.correct/mm.total*100);
-  const delay = ok ? 750 : 1050;
+  const delay = ok ? 750 : 1200;
   setTimeout(()=>{
-    resetNumpad('mm-display', mmVal);
+    mmVal.v = '';
     document.querySelectorAll('#mm-np-grid .npbtn').forEach(b=>b.style.pointerEvents='');
     if(mm.total >= 15 && pct >= 80){
       mmShowResults();
@@ -1614,7 +1653,29 @@ function exitMental(){
 init();
 buildNumpad('np-grid','np-display', ()=>{ ses.mode==='speed'?doSpeedSubmit():doSubmit(); }, pracVal);
 buildNumpad('star-np-grid','star-display', doStarSubmit, starVal);
-buildNumpad('mm-np-grid','mm-display', doMmSubmit, mmVal);
+// Mental maths numpad — updates inline blank in question
+(function(){
+  const grid = document.getElementById('mm-np-grid');
+  const keys = ['1','2','3','4','5','6','7','8','9','⌫','0','GO'];
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    btn.className = 'npbtn' + (k==='⌫'?' np-del':k==='GO'?' np-go':'');
+    btn.textContent = k;
+    btn.addEventListener('click', ()=>{
+      if(k === 'GO'){ doMmSubmit(); return; }
+      if(k === '⌫'){
+        mmVal.v = mmVal.v.slice(0,-1);
+      } else {
+        if(mmVal.v.length >= 4) return;
+        mmVal.v += k;
+      }
+      // Update the inline blank
+      const blank = document.getElementById('mm-blank');
+      if(blank) blank.textContent = mmVal.v || ' ';
+    });
+    grid.appendChild(btn);
+  });
+})();
 </script>
 </body>
 </html>
