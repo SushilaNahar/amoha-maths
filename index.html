@@ -388,10 +388,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
       <button class="hbtn hbtn-outline" onclick="goProg()">📊 My Progress</button>
       <button class="hbtn" style="background:var(--pl);color:var(--p);border:2px solid var(--bdr);" onclick="goMental()">🧠 Mental Maths</button>
       <div class="unlock-box">
-        <h3>🔐 Parent — Unlock Next Table</h3>
+        <h3>🔐 Parent — Unlock or Lock a Table</h3>
         <div class="urow">
-          <input class="uinput" id="uinp" type="number" placeholder="Enter table (2–9)" min="2" max="9" inputmode="numeric">
+          <input class="uinput" id="uinp" type="number" placeholder="Table (2–12)" min="2" max="12" inputmode="numeric">
           <button class="ubtn" onclick="doUnlock()">Unlock</button>
+          <button class="ubtn" style="background:var(--muted);" onclick="doLock()">Lock</button>
         </div>
         <div class="umsg" id="umsg"></div>
       </div>
@@ -575,10 +576,11 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
         <div id="mm-level-cards" style="display:flex;flex-direction:column;gap:8px;"></div>
 
         <div class="unlock-box" style="margin-top:4px;">
-          <h3>🔐 Parent — Unlock Any Level</h3>
+          <h3>🔐 Parent — Unlock or Lock a Level</h3>
           <div class="urow">
             <input class="uinput" id="mm-uinp" type="number" placeholder="Level (1–20)" min="1" max="20" inputmode="numeric">
             <button class="ubtn" onclick="doMmUnlock()">Unlock</button>
+            <button class="ubtn" style="background:var(--muted);" onclick="doMmLock()">Lock</button>
           </div>
           <div class="umsg" id="mm-umsg"></div>
         </div>
@@ -660,7 +662,7 @@ html,body{height:100%;font-family:'Nunito',sans-serif;background:var(--pw);color
 // ═══════════════════════════════════════════════
 // DATA & STATE
 // ═══════════════════════════════════════════════
-const TABLES=[2,3,4,5,6,7,8,9];
+const TABLES=[2,3,4,5,6,7,8,9,10,11,12];
 const TARGET=90, MINQS=20;
 
 const WP={
@@ -672,6 +674,9 @@ const WP={
   7:[{q:"4 weeks of 7 days each. How many days?",a:28},{q:"7 children with 8 marbles each. How many?",a:56},{q:"7 rows of 9 tiles. How many tiles?",a:63},{q:"7 trees with 5 fruits each. How many fruits?",a:35},{q:"7 children with 10 stickers each. How many?",a:70},{q:"She reads 7 pages a day. 9 days. How many?",a:63}],
   8:[{q:"6 spiders with 8 legs each. How many legs?",a:48},{q:"8 shelves of 4 books. How many books?",a:32},{q:"5 octopuses with 8 arms each. How many arms?",a:40},{q:"8 bags of 9 mangoes. How many mangoes?",a:72},{q:"8 children save ₹10 each. Total?",a:80},{q:"8 trees with 8 coconuts each. How many?",a:64}],
   9:[{q:"9 rows of 4 flowers. How many flowers?",a:36},{q:"9 children with 6 stickers each. How many?",a:54},{q:"7 crates of 9 bottles. How many bottles?",a:63},{q:"9 bags of 8 apples. How many apples?",a:72},{q:"5 necklaces of 9 beads each. How many?",a:45},{q:"9 days of 10 pages a day. How many pages?",a:90}],
+  10:[{q:"10 bags of 6 apples. How many apples?",a:60},{q:"Each box has 10 pencils. 8 boxes. How many pencils?",a:80},{q:"10 children with 7 stickers each. How many?",a:70},{q:"10 rows of 9 chairs. How many chairs?",a:90},{q:"She saves ₹10 a day. 12 days. How much?",a:120},{q:"10 packets of 5 biscuits. How many biscuits?",a:50}],
+  11:[{q:"11 bags of 3 apples. How many apples?",a:33},{q:"Each row has 11 seats. 4 rows. How many seats?",a:44},{q:"11 children with 5 stickers each. How many?",a:55},{q:"11 boxes of 6 crayons. How many crayons?",a:66},{q:"11 weeks. How many days?",a:77},{q:"11 shelves of 8 books. How many books?",a:88}],
+  12:[{q:"12 eggs in each tray. 3 trays. How many eggs?",a:36},{q:"12 months in a year. How many months in 4 years?",a:48},{q:"12 children with 5 sweets each. How many sweets?",a:60},{q:"12 boxes of 6 crayons. How many crayons?",a:72},{q:"12 bags of 7 apples. How many apples?",a:84},{q:"12 rows of 8 chairs. How many chairs?",a:96}],
 };
 
 let S=loadS();
@@ -1290,10 +1295,19 @@ function endStar(){
 // ═══════════════════════════════════════════════
 function doUnlock(){
   const v=parseInt(document.getElementById('uinp').value);const msg=document.getElementById('umsg');
-  if(!v||v<2||v>9){msg.textContent='Enter a number 2 to 9.';msg.style.color='#dc2626';return;}
+  if(!v||v<2||v>12){msg.textContent='Enter a number 2 to 12.';msg.style.color='#dc2626';return;}
   if(S.unlocked.includes(v)){msg.textContent=`The ${v} table is already unlocked!`;msg.style.color='var(--p)';return;}
   S.unlocked.push(v);S.unlocked.sort((a,b)=>a-b);saveS();buildGrid();
   msg.textContent=`✓ ${v} times table unlocked!`;msg.style.color='var(--p)';
+  document.getElementById('uinp').value='';setTimeout(()=>msg.textContent='',3000);
+}
+function doLock(){
+  const v=parseInt(document.getElementById('uinp').value);const msg=document.getElementById('umsg');
+  if(!v||v<2||v>12){msg.textContent='Enter a number 2 to 12.';msg.style.color='#dc2626';return;}
+  if(v===2||v===3){msg.textContent='Tables 2 and 3 cannot be locked — they are always open.';msg.style.color='#dc2626';return;}
+  if(!S.unlocked.includes(v)){msg.textContent=`The ${v} table is already locked.`;msg.style.color='var(--muted)';return;}
+  S.unlocked=S.unlocked.filter(t=>t!==v);saveS();buildGrid();
+  msg.textContent=`🔒 ${v} times table locked.`;msg.style.color='var(--muted)';
   document.getElementById('uinp').value='';setTimeout(()=>msg.textContent='',3000);
 }
 function resetAll(){S={unlocked:[2,3],stars:0,prog:{},starBest:null};saveS();buildGrid();updHdr();}
@@ -1713,6 +1727,28 @@ function doMmUnlock(){
   buildMmLevelCards();
   msg.textContent = '✓ Level ' + v + ' unlocked for Amoha!';
   msg.style.color = 'var(--p)';
+  document.getElementById('mm-uinp').value = '';
+  setTimeout(()=>msg.textContent='', 3000);
+}
+function doMmLock(){
+  const v = parseInt(document.getElementById('mm-uinp').value);
+  const msg = document.getElementById('mm-umsg');
+  if(!v || v < 1 || v > 20){
+    msg.textContent = 'Enter a level between 1 and 20.';
+    msg.style.color = '#dc2626'; return;
+  }
+  if(v === 1){
+    msg.textContent = 'Level 1 cannot be locked — it is always open.';
+    msg.style.color = '#dc2626'; return;
+  }
+  const idx = v - 1;
+  // Remove from both mmUnlocked and mmPassed
+  if(S.mmUnlocked) S.mmUnlocked[idx] = false;
+  if(S.mmPassed) S.mmPassed[idx] = false;
+  saveS();
+  buildMmLevelCards();
+  msg.textContent = '🔒 Level ' + v + ' locked.';
+  msg.style.color = 'var(--muted)';
   document.getElementById('mm-uinp').value = '';
   setTimeout(()=>msg.textContent='', 3000);
 }
